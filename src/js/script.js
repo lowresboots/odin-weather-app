@@ -1,2 +1,6 @@
 import '../css/style.css';
-console.log('Boots Weather is running!');
+import feather from 'feather-icons';
+
+feather.replace();
+
+console.log('Weather Boots is running!');

@@ -7,7 +7,30 @@
     <title>Weather Boots</title>
 </head>
 <body>
-    <h1>Weather Boots</h1>
-    <img src="assets/boot-logo.svg" alt="Boot Logo" width="50">
+    <div class="container">
+        <div class="weather-card">
+            <div class="header">
+                <img src="assets/boot-logo.svg" alt="Boot Logo" class="boot-logo">
+                <div class="search-section">
+                    <div class="search-bar">
+                        <i data-feather="search"></i>
+                        <input type="text" placeholder="Search location...">
+                    </div>
+                    <div class="temp-toggle">
+                        <span class="active">°F</span>
+                        <span>°C</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="weather-info hidden">
+            
+            </div>
+
+            <div class="loading hidden">
+                <i data-feather="loader"></i>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
