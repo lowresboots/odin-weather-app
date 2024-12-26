@@ -148,6 +148,43 @@ body {
     stroke-width: 2;
 }
 
+.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.loading .feather {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.hidden {
+    display: none !important;
+}
+
+.error-message {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    margin: 20px auto;
+    max-width: 500px;
+}
+
+.error-message .feather {
+    color: #ff6b6b;
+}
+
 @media (max-width: 768px) {
     .container {
         padding: 10px;
