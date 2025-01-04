@@ -72,10 +72,8 @@ function generateTemperatureCurve(hourlyData) {
 
     const ctx = document.getElementById('tempChart').getContext('2d');
     
-    // Get current hour
     const currentHour = new Date().getHours();
     
-    // Get next 12 hours starting from current hour
     const processedData = hourlyData
         .slice(currentHour, currentHour + 12)
         .map(hour => ({
@@ -103,6 +101,11 @@ function generateTemperatureCurve(hourlyData) {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    bottom: -20
+                }
+            },
             plugins: {
                 legend: {
                     display: false
@@ -139,8 +142,9 @@ function generateTemperatureCurve(hourlyData) {
                     ticks: {
                         color: 'rgba(255, 255, 255, 0.8)',
                         font: {
-                            size: 12
-                        }
+                            size: 14
+                        },
+                        padding: 20
                     },
                     border: {
                         display: false
