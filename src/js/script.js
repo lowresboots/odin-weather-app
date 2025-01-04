@@ -1,5 +1,6 @@
 import '../css/style.css';
 import feather from 'feather-icons';
+import Chart from 'chart.js/auto';
 
 feather.replace();
 
@@ -8,6 +9,7 @@ const BASE_URL = 'https://weather.visualcrossing.com/VisualCrossingWebServices/r
 
 let currentUnit = 'F';
 let lastWeatherData = null;
+let currentChart = null;
 
 const elements = {
     searchInput: document.querySelector('.search-bar input'),
@@ -63,6 +65,98 @@ function displayTemperature(temp, unit = 'F') {
     return `${Math.round(temperature)}°`;
 }
 
+function generateTemperatureCurve(hourlyData) {
+    if (currentChart) {
+        currentChart.destroy();
+    }
+
+    const ctx = document.getElementById('tempChart').getContext('2d');
+    
+    // Get current hour
+    const currentHour = new Date().getHours();
+    
+    // Get next 12 hours starting from current hour
+    const processedData = hourlyData
+        .slice(currentHour, currentHour + 12)
+        .map(hour => ({
+            time: hour.datetime.slice(0, 2) + ':00',
+            temp: hour.temp
+        }));
+
+    currentChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: processedData.map(data => data.time),
+            datasets: [{
+                label: 'Temperature',
+                data: processedData.map(data => data.temp),
+                borderColor: 'rgba(255, 255, 255, 0.8)',
+                borderWidth: 2,
+                pointBackgroundColor: 'rgba(255, 255, 255, 0.8)',
+                pointBorderColor: '#4A90E2',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                tension: 0.4,
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                    titleColor: '#4A90E2',
+                    bodyColor: '#4A90E2',
+                    titleFont: {
+                        size: 14
+                    },
+                    bodyFont: {
+                        size: 14
+                    },
+                    padding: 10,
+                    displayColors: false,
+                    callbacks: {
+                        label: function(context) {
+                            let temp = context.parsed.y;
+                            if (currentUnit === 'C') {
+                                temp = fahrenheitToCelsius(temp);
+                            }
+                            return `${Math.round(temp)}°${currentUnit}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        display: false,
+                        drawBorder: false
+                    },
+                    ticks: {
+                        color: 'rgba(255, 255, 255, 0.8)',
+                        font: {
+                            size: 12
+                        }
+                    },
+                    border: {
+                        display: false
+                    }
+                },
+                y: {
+                    display: false,
+                    border: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+}
+
 async function fetchWeather(location) {
     showLoading();
     hideError();
@@ -73,6 +167,7 @@ async function fetchWeather(location) {
 
         if (response.ok) {
             lastWeatherData = data;
+            console.log('Hourly data:', data.days[0].hours); // Added here
             await new Promise(resolve => setTimeout(resolve, 500));
             updateUI(data, currentUnit);
             elements.weatherContent.classList.remove('hidden');
@@ -108,6 +203,8 @@ function updateUI(data, unit = 'F') {
     elements.tempButtons.forEach(button => {
         button.classList.toggle('active', button.textContent.includes(unit));
     });
+
+    generateTemperatureCurve(data.days[0].hours);
 }
 
 function handleUnitChange(unit) {
