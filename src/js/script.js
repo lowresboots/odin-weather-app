@@ -171,7 +171,7 @@ async function fetchWeather(location) {
 
         if (response.ok) {
             lastWeatherData = data;
-            console.log('Hourly data:', data.days[0].hours); // Added here
+            console.log('Hourly data:', data.days[0].hours);
             await new Promise(resolve => setTimeout(resolve, 500));
             updateUI(data, currentUnit);
             elements.weatherContent.classList.remove('hidden');
@@ -191,6 +191,8 @@ async function fetchWeather(location) {
 
 function updateUI(data, unit = 'F') {
     const current = data.currentConditions;
+
+    document.body.style.backgroundColor = getBackgroundColor(current.conditions, current.datetime);
     
     elements.location.textContent = data.resolvedAddress;
     elements.temperature.textContent = displayTemperature(current.temp, unit);
@@ -209,6 +211,48 @@ function updateUI(data, unit = 'F') {
     });
 
     generateTemperatureCurve(data.days[0].hours);
+}
+
+function getBackgroundColor(conditions, datetime) {
+    conditions = conditions.toLowerCase();
+    const hour = new Date(datetime).getHours();
+    
+    const colorSchemes = {
+        clear: '#4A90E2',
+        sunny: '#4A90E2',
+        rain: '#3B7BCE',
+        'partly cloudy': '#5499E4',
+        'partially cloudy': '#5499E4',
+        cloudy: '#4885D6',
+        overcast: '#4076C2',
+        snow: '#5499E4',
+        storm: '#3B7BCE',
+        default: '#4A90E2'
+    };
+
+    let baseColor = colorSchemes.default;
+    for (let condition in colorSchemes) {
+        if (conditions.includes(condition)) {
+            baseColor = colorSchemes[condition];
+            break;
+        }
+    }
+
+    if (hour >= 20 || hour < 6) {
+        return adjustColor(baseColor, -30);
+    } else if (hour < 9 || hour >= 17) {
+        return adjustColor(baseColor, -15);
+    } else {
+        return baseColor;
+    }
+}
+
+function adjustColor(color, amount) {
+    const num = parseInt(color.replace('#', ''), 16);
+    const r = Math.max(0, Math.min(255, (num >> 16) + amount));
+    const b = Math.max(0, Math.min(255, ((num >> 8) & 0x00FF) + amount));
+    const g = Math.max(0, Math.min(255, (num & 0x0000FF) + amount));
+    return `#${(g | (b << 8) | (r << 16)).toString(16).padStart(6, '0')}`;
 }
 
 function handleUnitChange(unit) {

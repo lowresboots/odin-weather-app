@@ -10,6 +10,7 @@ body {
     background-color: #4A90E2;
     color: white;
     overflow: hidden;
+    transition: background-color 2s ease;
 }
 
 .container {
