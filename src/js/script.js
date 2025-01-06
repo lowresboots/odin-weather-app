@@ -27,7 +27,9 @@ const elements = {
     feelsLike: document.querySelector('.detail-card:nth-child(4) .value'),
     visibility: document.querySelector('.detail-card:nth-child(5) .value'),
     pressure: document.querySelector('.detail-card:nth-child(6) .value'),
-    errorMessage: document.querySelector('.error-message')
+    errorMessage: document.querySelector('.error-message'),
+    day: document.querySelector('.day'),
+    time: document.querySelector('.time')
 };
 
 function showLoading() {
@@ -65,19 +67,24 @@ function displayTemperature(temp, unit = 'F') {
     return `${Math.round(temperature)}°`;
 }
 
-function generateTemperatureCurve(hourlyData) {
+function generateTemperatureCurve(hourlyData, timezone) {
     if (currentChart) {
         currentChart.destroy();
     }
 
     const ctx = document.getElementById('tempChart').getContext('2d');
     
-    const currentHour = new Date().getHours();
+    const nextDayFirstHour = hourlyData.length > 24 ? hourlyData[24] : { 
+        datetime: '00:00:00',
+        temp: hourlyData[23].temp 
+    };
     
     const processedData = hourlyData
-        .slice(currentHour, currentHour + 12)
+        .slice(0, 24)
+        .filter((hour, index) => index === 0 || index % 4 === 0)
+        .concat([nextDayFirstHour])
         .map(hour => ({
-            time: hour.datetime.slice(0, 2) + ':00',
+            time: hour.datetime.slice(0, 5),
             temp: hour.temp
         }));
 
@@ -161,6 +168,68 @@ function generateTemperatureCurve(hourlyData) {
     });
 }
 
+function getWeatherIcon(conditions) {
+    conditions = conditions.toLowerCase();
+    
+    const iconMap = {
+        'clear': 'sun',
+        'sunny': 'sun',
+        'partly cloudy': 'cloud',
+        'partially cloudy': 'cloud',
+        'cloudy': 'cloud',
+        'overcast': 'cloud',
+        'rain': 'cloud-rain',
+        'snow': 'cloud-snow',
+        'storm': 'cloud-lightning',
+        'fog': 'cloud',
+        'wind': 'wind'
+    };
+
+    for (const [condition, icon] of Object.entries(iconMap)) {
+        if (conditions.includes(condition)) {
+            return icon;
+        }
+    }
+    
+    return 'sun';
+}
+
+function updateWeeklyForecast(data, unit = 'F') {
+    const weeklyForecast = document.querySelector('.weekly-forecast');
+    weeklyForecast.innerHTML = '';
+    
+    const currentDay = new Date(data.currentConditions.datetimeEpoch * 1000).getDay();
+    
+    data.days.slice(0, 7).forEach((day) => {
+        const date = new Date(day.datetimeEpoch * 1000);
+        const dayOfWeek = date.toLocaleDateString('en-US', { weekday: 'short' });
+        const isCurrentDay = date.getDay() === currentDay;
+        
+        let maxTemp = day.tempmax;
+        let minTemp = day.tempmin;
+        if (unit === 'C') {
+            maxTemp = fahrenheitToCelsius(maxTemp);
+            minTemp = fahrenheitToCelsius(minTemp);
+        }
+        
+        const card = document.createElement('div');
+        card.className = `forecast-card${isCurrentDay ? ' current-day' : ''}`;
+        
+        card.innerHTML = `
+            <div class="forecast-day">${dayOfWeek}</div>
+            <i data-feather="${getWeatherIcon(day.conditions)}"></i>
+            <div class="forecast-temp">
+                <span class="max">${Math.round(maxTemp)}°</span>
+                <span class="min">${Math.round(minTemp)}°</span>
+            </div>
+        `;
+        
+        weeklyForecast.appendChild(card);
+    });
+    
+    feather.replace();
+}
+
 async function fetchWeather(location) {
     showLoading();
     hideError();
@@ -193,6 +262,22 @@ function updateUI(data, unit = 'F') {
     const current = data.currentConditions;
 
     document.body.style.backgroundColor = getBackgroundColor(current.conditions, current.datetime);
+
+    const date = new Date(current.datetimeEpoch * 1000);
+    date.setMinutes(0);
+    const dayStr = date.toLocaleString('en-US', { 
+        weekday: 'long',
+        timeZone: data.timezone 
+    });
+    const timeStr = date.toLocaleString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+        timeZone: data.timezone
+    });
+
+    elements.day.textContent = dayStr;
+    elements.time.textContent = timeStr;
     
     elements.location.textContent = data.resolvedAddress;
     elements.temperature.textContent = displayTemperature(current.temp, unit);
@@ -210,7 +295,8 @@ function updateUI(data, unit = 'F') {
         button.classList.toggle('active', button.textContent.includes(unit));
     });
 
-    generateTemperatureCurve(data.days[0].hours);
+    generateTemperatureCurve(data.days[0].hours, data.timezone);
+    updateWeeklyForecast(data, unit);
 }
 
 function getBackgroundColor(conditions, datetime) {

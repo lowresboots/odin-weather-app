@@ -32,7 +32,13 @@
             </div>
             <div class="weather-content">
                 <div class="primary-weather">
-                    <h2 class="location"></h2>
+                    <div class="primary-header">
+                        <h2 class="location"></h2>
+                        <div class="datetime">
+                            <span class="day"></span>
+                            <span class="time"></span>
+                        </div>
+                    </div>
                     <div class="temperature"></div>
                     <div class="condition">
                         <i data-feather="sun"></i>
@@ -76,8 +82,15 @@
                 <div class="temperature-curve">
                     <canvas id="tempChart"></canvas>
                 </div>
+                <div class="weekly-forecast">
+                    <div class="forecast-card">
+                    </div>
+                </div>
             </div>
         </main>
+        <footer class="footer">
+            <p>Created for <a href="https://www.theodinproject.com" target="_blank" rel="noopener noreferrer">The Odin Project</a> by <a href="https://x.com/lowresboots" target="_blank" rel="noopener noreferrer">@lowresboots</a></p>
+        </footer>
     </div>
 </body>
 
