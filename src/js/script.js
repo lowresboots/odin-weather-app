@@ -33,14 +33,21 @@ const elements = {
 };
 
 function showLoading() {
-    elements.loading.classList.remove('hidden');
+    const bootLogo = document.querySelector('.boot-logo');
+    const loadingLogo = document.querySelector('.loading-logo');
+    
+    bootLogo.classList.add('icon-hidden');
+    loadingLogo.classList.remove('icon-hidden');
     elements.weatherContent.classList.add('hidden');
     elements.errorMessage.classList.add('hidden');
-    feather.replace();
 }
 
 function hideLoading() {
-    elements.loading.classList.add('hidden');
+    const bootLogo = document.querySelector('.boot-logo');
+    const loadingLogo = document.querySelector('.loading-logo');
+    
+    bootLogo.classList.remove('icon-hidden');
+    loadingLogo.classList.add('icon-hidden');
 }
 
 function showError(message) {
@@ -67,6 +74,28 @@ function displayTemperature(temp, unit = 'F') {
     return `${Math.round(temperature)}°`;
 }
 
+function getChartColors(conditions, datetime) {
+    const baseColor = getBackgroundColor(conditions, datetime);
+    const rgb = hexToRgb(baseColor);
+    
+    return {
+        line: `rgba(255, 255, 255, 0.8)`,
+        point: `rgba(255, 255, 255, 0.8)`,
+        pointBorder: baseColor,
+        grid: `rgba(255, 255, 255, 0.1)`,
+        text: `rgba(255, 255, 255, 0.8)`
+    };
+}
+
+function hexToRgb(hex) {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+    } : null;
+}
+
 function generateTemperatureCurve(hourlyData, timezone) {
     if (currentChart) {
         currentChart.destroy();
@@ -88,6 +117,11 @@ function generateTemperatureCurve(hourlyData, timezone) {
             temp: hour.temp
         }));
 
+    const chartColors = getChartColors(
+        lastWeatherData.currentConditions.conditions,
+        lastWeatherData.currentConditions.datetime
+    );
+
     currentChart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -95,10 +129,10 @@ function generateTemperatureCurve(hourlyData, timezone) {
             datasets: [{
                 label: 'Temperature',
                 data: processedData.map(data => data.temp),
-                borderColor: 'rgba(255, 255, 255, 0.8)',
+                borderColor: chartColors.line,
                 borderWidth: 2,
-                pointBackgroundColor: 'rgba(255, 255, 255, 0.8)',
-                pointBorderColor: '#4A90E2',
+                pointBackgroundColor: chartColors.point,
+                pointBorderColor: chartColors.pointBorder,
                 pointBorderWidth: 2,
                 pointRadius: 4,
                 tension: 0.4,
@@ -119,8 +153,8 @@ function generateTemperatureCurve(hourlyData, timezone) {
                 },
                 tooltip: {
                     backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                    titleColor: '#4A90E2',
-                    bodyColor: '#4A90E2',
+                    titleColor: chartColors.pointBorder,
+                    bodyColor: chartColors.pointBorder,
                     titleFont: {
                         size: 14
                     },
@@ -147,7 +181,7 @@ function generateTemperatureCurve(hourlyData, timezone) {
                         drawBorder: false
                     },
                     ticks: {
-                        color: 'rgba(255, 255, 255, 0.8)',
+                        color: chartColors.text,
                         font: {
                             size: 14
                         },

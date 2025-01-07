@@ -11,7 +11,12 @@
 <body>
     <div class="container">
         <header class="header">
-            <img src="assets/boot-logo.svg" alt="Boot Logo" class="boot-logo">
+            <div class="logo-container">
+                <div class="logo-wrapper">
+                    <img src="assets/boot-logo.svg" alt="Boot Logo" class="boot-logo">
+                    <i data-feather="loader" class="loading-logo icon-hidden"></i>
+                </div>
+            </div>
             <div class="search-bar">
                 <i data-feather="search"></i>
                 <input type="text" placeholder="Search location...">
@@ -23,9 +28,6 @@
         </header>
 
         <main>
-            <div class="loading hidden">
-                <i data-feather="loader"></i>
-            </div>
             <div class="error-message hidden">
                 <i data-feather="alert-circle"></i>
                 <span>Location not found. Please try again.</span>
