@@ -17,10 +17,10 @@ const elements = {
     tempButtons: document.querySelectorAll('.temp-toggle span'),
     loading: document.querySelector('.loading'),
     weatherContent: document.querySelector('.weather-content'),
-    location: document.querySelector('.location'),
+    cityState: document.querySelector('.city-state'),
+    country: document.querySelector('.country'),
     temperature: document.querySelector('.temperature'),
     condition: document.querySelector('.condition span'),
-    highLow: document.querySelector('.high-low'),
     humidity: document.querySelector('.detail-card .value'),
     wind: document.querySelector('.detail-card:nth-child(2) .value'),
     precipitation: document.querySelector('.detail-card:nth-child(3) .value'),
@@ -319,10 +319,11 @@ function updateUI(data, unit = 'F') {
     elements.day.textContent = dayStr;
     elements.time.textContent = timeStr;
     
-    elements.location.textContent = data.resolvedAddress;
+    const locationParts = data.resolvedAddress.split(', ');
+    elements.cityState.textContent = locationParts.slice(0, -1).join(', ');
+    elements.country.textContent = locationParts[locationParts.length - 1];
     elements.temperature.textContent = displayTemperature(current.temp, unit);
     elements.condition.textContent = current.conditions;
-    elements.highLow.textContent = `H: ${displayTemperature(data.days[0].tempmax, unit)} L: ${displayTemperature(data.days[0].tempmin, unit)}`;
     
     elements.humidity.textContent = `${Math.round(current.humidity)}%`;
     elements.wind.textContent = `${Math.round(current.windspeed)} mph`;

@@ -109,29 +109,18 @@ body {
     align-items: start;
 }
 
-.primary-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.datetime {
-    text-align: right;
-    font-size: 14px;
-    opacity: 0.8;
-    display: flex;
-    gap: 8px;
-}
-
-.day {
-    margin-bottom: 4px;
-}
-
 .primary-weather {
     background-color: rgba(255, 255, 255, 0.1);
     border-radius: 15px;
     padding: 30px;
+    height: 100%;
+}
+
+.primary-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
 }
 
 .location {
@@ -139,22 +128,48 @@ body {
     margin: 0;
 }
 
-.temperature {
-    font-size: 72px;
+.location .city-state {
     font-weight: bold;
-    margin: 20px 0;
+}
+
+.location .country {
+    font-size: 18px;
+    opacity: 0.8;
+}
+
+.datetime {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-end;
+}
+
+.date-time-wrapper {
+    font-size: 14px;
+    opacity: 0.8;
+    display: flex;
+    gap: 8px;
 }
 
 .condition {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin: 15px 0;
+    font-size: 14px;
+    opacity: 0.8;
 }
 
-.high-low {
-    font-size: 16px;
-    opacity: 0.9;
+.weather-info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.temperature {
+    font-size: 120px;
+    font-weight: bold;
+    line-height: 1;
 }
 
 .weather-details {
