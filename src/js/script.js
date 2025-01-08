@@ -233,8 +233,14 @@ function updateWeeklyForecast(data, unit = 'F') {
     weeklyForecast.innerHTML = '';
     
     const currentDay = new Date(data.currentConditions.datetimeEpoch * 1000).getDay();
+    const daysToSunday = currentDay;
     
-    data.days.slice(0, 7).forEach((day) => {
+    const orderedDays = [
+        ...data.days.slice(7 - daysToSunday, 7),
+        ...data.days.slice(0, 7 - daysToSunday)
+    ];
+    
+    orderedDays.slice(0, 7).forEach((day) => {
         const date = new Date(day.datetimeEpoch * 1000);
         const dayOfWeek = date.toLocaleDateString('en-US', { weekday: 'short' });
         const isCurrentDay = date.getDay() === currentDay;
