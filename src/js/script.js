@@ -232,18 +232,10 @@ function updateWeeklyForecast(data, unit = 'F') {
     const weeklyForecast = document.querySelector('.weekly-forecast');
     weeklyForecast.innerHTML = '';
     
-    const currentDay = new Date(data.currentConditions.datetimeEpoch * 1000).getDay();
-    const daysToSunday = currentDay;
-    
-    const orderedDays = [
-        ...data.days.slice(7 - daysToSunday, 7),
-        ...data.days.slice(0, 7 - daysToSunday)
-    ];
-    
-    orderedDays.slice(0, 7).forEach((day) => {
+    data.days.slice(0, 7).forEach((day, index) => {
         const date = new Date(day.datetimeEpoch * 1000);
         const dayOfWeek = date.toLocaleDateString('en-US', { weekday: 'short' });
-        const isCurrentDay = date.getDay() === currentDay;
+        const isCurrentDay = index === 0;
         
         let maxTemp = day.tempmax;
         let minTemp = day.tempmin;
@@ -254,6 +246,13 @@ function updateWeeklyForecast(data, unit = 'F') {
         
         const card = document.createElement('div');
         card.className = `forecast-card${isCurrentDay ? ' current-day' : ''}`;
+        
+        card.style.cursor = 'pointer';
+        card.addEventListener('click', () => {
+            updatePrimaryCard(day, isCurrentDay, data.timezone);
+            document.querySelectorAll('.forecast-card').forEach(c => c.classList.remove('current-day'));
+            card.classList.add('current-day');
+        });
         
         card.innerHTML = `
             <div class="forecast-day">${dayOfWeek}</div>
@@ -268,6 +267,39 @@ function updateWeeklyForecast(data, unit = 'F') {
     });
     
     feather.replace();
+}
+
+function updatePrimaryCard(dayData, isCurrentDay, timezone) {
+    const date = new Date(dayData.datetimeEpoch * 1000);
+    
+    const dayStr = date.toLocaleString('en-US', { 
+        weekday: 'long',
+        timeZone: timezone 
+    });
+    
+    const timeStr = isCurrentDay ? date.toLocaleString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+        timeZone: timezone
+    }) : '';
+    
+    elements.day.textContent = dayStr;
+    elements.time.textContent = timeStr;
+    
+    elements.temperature.textContent = displayTemperature(dayData.temp || dayData.tempmax, currentUnit);
+    elements.condition.textContent = dayData.conditions;
+    
+    elements.humidity.textContent = `${Math.round(dayData.humidity)}%`;
+    elements.wind.textContent = `${Math.round(dayData.windspeed)} mph`;
+    elements.precipitation.textContent = `${Math.round(dayData.precipprob || 0)}%`;
+    elements.feelsLike.textContent = displayTemperature(dayData.feelslike || dayData.temp || dayData.tempmax, currentUnit);
+    elements.visibility.textContent = `${Math.round(dayData.visibility)} mi`;
+    elements.pressure.textContent = `${Math.round(dayData.pressure)} hPa`;
+    
+    if (dayData.hours) {
+        generateTemperatureCurve(dayData.hours, timezone);
+    }
 }
 
 async function fetchWeather(location) {
