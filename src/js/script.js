@@ -369,8 +369,22 @@ function updateUI(data, unit = 'F') {
     elements.day.textContent = dayStr;
     
     const locationParts = data.resolvedAddress.split(', ');
-    elements.cityState.textContent = locationParts.slice(0, -1).join(', ');
-    elements.country.textContent = locationParts[locationParts.length - 1];
+
+    // Handle location formats
+    if (locationParts.length === 1) {
+        // Single item (like "United States" or full state name)
+        elements.cityState.textContent = locationParts[0];
+        elements.country.textContent = '';
+    } else if (locationParts.length === 2 && locationParts[1] === 'United States') {
+        // State with country (like "California, United States")
+        elements.cityState.textContent = locationParts[0];
+        elements.country.textContent = locationParts[1];
+    } else {
+        // City, State, Country format
+        elements.cityState.textContent = locationParts.slice(0, -1).join(', ');
+        elements.country.textContent = locationParts[locationParts.length - 1];
+    }
+    
     elements.temperature.textContent = displayTemperature(current.temp, unit);
     elements.condition.textContent = current.conditions;
     
@@ -388,11 +402,13 @@ function updateUI(data, unit = 'F') {
     generateTemperatureCurve(data.days[0].hours, data.timezone);
     updateWeeklyForecast(data, unit);
 
+    // Clear any existing interval before setting new one
     if (timeInterval) {
         clearInterval(timeInterval);
         timeInterval = null;
     }
 
+    // Start updating local time
     if (data.timezone) {
         updateLocalTime(data.timezone);
         timeInterval = setInterval(() => updateLocalTime(data.timezone), 1000);
