@@ -10,6 +10,7 @@ const BASE_URL = 'https://weather.visualcrossing.com/VisualCrossingWebServices/r
 let currentUnit = 'F';
 let lastWeatherData = null;
 let currentChart = null;
+let timeInterval;
 
 const elements = {
     searchInput: document.querySelector('.search-bar input'),
@@ -270,6 +271,11 @@ function updateWeeklyForecast(data, unit = 'F') {
 }
 
 function updatePrimaryCard(dayData, isCurrentDay, timezone) {
+    if (timeInterval) {
+        clearInterval(timeInterval);
+        timeInterval = null;
+    }
+
     const date = new Date(dayData.datetimeEpoch * 1000);
     
     const dayStr = date.toLocaleString('en-US', { 
@@ -277,25 +283,33 @@ function updatePrimaryCard(dayData, isCurrentDay, timezone) {
         timeZone: timezone 
     });
     
-    const timeStr = isCurrentDay ? date.toLocaleString('en-US', {
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true,
-        timeZone: timezone
-    }) : '';
-    
     elements.day.textContent = dayStr;
-    elements.time.textContent = timeStr;
-    
-    elements.temperature.textContent = displayTemperature(dayData.temp || dayData.tempmax, currentUnit);
-    elements.condition.textContent = dayData.conditions;
-    
-    elements.humidity.textContent = `${Math.round(dayData.humidity)}%`;
-    elements.wind.textContent = `${Math.round(dayData.windspeed)} mph`;
-    elements.precipitation.textContent = `${Math.round(dayData.precipprob || 0)}%`;
-    elements.feelsLike.textContent = displayTemperature(dayData.feelslike || dayData.temp || dayData.tempmax, currentUnit);
-    elements.visibility.textContent = `${Math.round(dayData.visibility)} mi`;
-    elements.pressure.textContent = `${Math.round(dayData.pressure)} hPa`;
+    elements.time.textContent = '';
+
+    if (isCurrentDay && lastWeatherData) {
+        const current = lastWeatherData.currentConditions;
+        
+        elements.temperature.textContent = displayTemperature(current.temp, currentUnit);
+        elements.condition.textContent = current.conditions;
+        elements.humidity.textContent = `${Math.round(current.humidity)}%`;
+        elements.wind.textContent = `${Math.round(current.windspeed)} mph`;
+        elements.precipitation.textContent = `${Math.round(current.precipprob || 0)}%`;
+        elements.feelsLike.textContent = displayTemperature(current.feelslike, currentUnit);
+        elements.visibility.textContent = `${Math.round(current.visibility)} mi`;
+        elements.pressure.textContent = `${Math.round(current.pressure)} hPa`;
+
+        updateLocalTime(timezone);
+        timeInterval = setInterval(() => updateLocalTime(timezone), 1000);
+    } else {
+        elements.temperature.textContent = displayTemperature(dayData.temp || dayData.tempmax, currentUnit);
+        elements.condition.textContent = dayData.conditions;
+        elements.humidity.textContent = `${Math.round(dayData.humidity)}%`;
+        elements.wind.textContent = `${Math.round(dayData.windspeed)} mph`;
+        elements.precipitation.textContent = `${Math.round(dayData.precipprob || 0)}%`;
+        elements.feelsLike.textContent = displayTemperature(dayData.feelslike || dayData.temp || dayData.tempmax, currentUnit);
+        elements.visibility.textContent = `${Math.round(dayData.visibility)} mi`;
+        elements.pressure.textContent = `${Math.round(dayData.pressure)} hPa`;
+    }
     
     if (dayData.hours) {
         generateTemperatureCurve(dayData.hours, timezone);
@@ -330,6 +344,16 @@ async function fetchWeather(location) {
     }
 }
 
+function updateLocalTime(timezone) {
+    const timeStr = new Date().toLocaleString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+        timeZone: timezone
+    });
+    elements.time.textContent = timeStr;
+}
+
 function updateUI(data, unit = 'F') {
     const current = data.currentConditions;
 
@@ -341,15 +365,8 @@ function updateUI(data, unit = 'F') {
         weekday: 'long',
         timeZone: data.timezone 
     });
-    const timeStr = date.toLocaleString('en-US', {
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true,
-        timeZone: data.timezone
-    });
 
     elements.day.textContent = dayStr;
-    elements.time.textContent = timeStr;
     
     const locationParts = data.resolvedAddress.split(', ');
     elements.cityState.textContent = locationParts.slice(0, -1).join(', ');
@@ -370,6 +387,16 @@ function updateUI(data, unit = 'F') {
 
     generateTemperatureCurve(data.days[0].hours, data.timezone);
     updateWeeklyForecast(data, unit);
+
+    if (timeInterval) {
+        clearInterval(timeInterval);
+        timeInterval = null;
+    }
+
+    if (data.timezone) {
+        updateLocalTime(data.timezone);
+        timeInterval = setInterval(() => updateLocalTime(data.timezone), 1000);
+    }
 }
 
 function getBackgroundColor(conditions, datetime) {
