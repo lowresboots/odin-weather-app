@@ -205,21 +205,22 @@ function generateTemperatureCurve(hourlyData, timezone) {
 function getWeatherIcon(conditions) {
     conditions = conditions.toLowerCase();
     
-    const iconMap = {
-        'clear': 'sun',
-        'sunny': 'sun',
-        'partly cloudy': 'cloud',
-        'partially cloudy': 'cloud',
-        'cloudy': 'cloud',
-        'overcast': 'cloud',
-        'rain': 'cloud-rain',
-        'snow': 'cloud-snow',
-        'storm': 'cloud-lightning',
-        'fog': 'cloud',
-        'wind': 'wind'
-    };
+    const iconMap = [
+        { condition: 'snow', icon: 'cloud-snow' },
+        { condition: 'storm', icon: 'cloud-lightning' },
+        { condition: 'rain', icon: 'cloud-rain' },
+        { condition: 'thunder', icon: 'cloud-lightning' },
+        { condition: 'fog', icon: 'cloud' },
+        { condition: 'overcast', icon: 'cloud' },
+        { condition: 'partly cloudy', icon: 'cloud' },
+        { condition: 'partially cloudy', icon: 'cloud' },
+        { condition: 'cloudy', icon: 'cloud' },
+        { condition: 'wind', icon: 'wind' },
+        { condition: 'clear', icon: 'sun' },
+        { condition: 'sunny', icon: 'sun' }
+    ];
 
-    for (const [condition, icon] of Object.entries(iconMap)) {
+    for (const { condition, icon } of iconMap) {
         if (conditions.includes(condition)) {
             return icon;
         }
