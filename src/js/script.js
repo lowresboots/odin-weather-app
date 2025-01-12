@@ -21,7 +21,6 @@ const elements = {
     cityState: document.querySelector('.city-state'),
     country: document.querySelector('.country'),
     temperature: document.querySelector('.temperature'),
-    condition: document.querySelector('.condition span'),
     humidity: document.querySelector('.detail-card .value'),
     wind: document.querySelector('.detail-card:nth-child(2) .value'),
     precipitation: document.querySelector('.detail-card:nth-child(3) .value'),
@@ -290,7 +289,14 @@ function updatePrimaryCard(dayData, isCurrentDay, timezone) {
         const current = lastWeatherData.currentConditions;
         
         elements.temperature.textContent = displayTemperature(current.temp, currentUnit);
-        elements.condition.textContent = current.conditions;
+        
+        const conditionDiv = document.querySelector('.condition');
+        conditionDiv.innerHTML = `
+            <i data-feather="${getWeatherIcon(current.conditions)}"></i>
+            <span>${current.conditions}</span>
+        `;
+        feather.replace();
+        
         elements.humidity.textContent = `${Math.round(current.humidity)}%`;
         elements.wind.textContent = `${Math.round(current.windspeed)} mph`;
         elements.precipitation.textContent = `${Math.round(current.precipprob || 0)}%`;
@@ -302,7 +308,14 @@ function updatePrimaryCard(dayData, isCurrentDay, timezone) {
         timeInterval = setInterval(() => updateLocalTime(timezone), 1000);
     } else {
         elements.temperature.textContent = displayTemperature(dayData.temp || dayData.tempmax, currentUnit);
-        elements.condition.textContent = dayData.conditions;
+        
+        const conditionDiv = document.querySelector('.condition');
+        conditionDiv.innerHTML = `
+            <i data-feather="${getWeatherIcon(dayData.conditions)}"></i>
+            <span>${dayData.conditions}</span>
+        `;
+        feather.replace();
+        
         elements.humidity.textContent = `${Math.round(dayData.humidity)}%`;
         elements.wind.textContent = `${Math.round(dayData.windspeed)} mph`;
         elements.precipitation.textContent = `${Math.round(dayData.precipprob || 0)}%`;
@@ -382,7 +395,13 @@ function updateUI(data, unit = 'F') {
     }
     
     elements.temperature.textContent = displayTemperature(current.temp, unit);
-    elements.condition.textContent = current.conditions;
+    
+    const conditionDiv = document.querySelector('.condition');
+    conditionDiv.innerHTML = `
+        <i data-feather="${getWeatherIcon(current.conditions)}"></i>
+        <span>${current.conditions}</span>
+    `;
+    feather.replace();
     
     elements.humidity.textContent = `${Math.round(current.humidity)}%`;
     elements.wind.textContent = `${Math.round(current.windspeed)} mph`;
