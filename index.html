@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:,">
+    <title>Weather Boots</title>
+<script defer src="main.js"></script></head>
+
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo-container">
+                <div class="logo-wrapper">
+                    <img src="assets/boot-logo.svg" alt="Boot Logo" class="boot-logo">
+                    <i data-feather="loader" class="loading-logo icon-hidden"></i>
+                </div>
+            </div>
+            <div class="search-bar">
+                <i data-feather="search"></i>
+                <input type="text" placeholder="Search location...">
+            </div>
+            <div class="temp-toggle">
+                <span class="active">°F</span>
+                <span>°C</span>
+            </div>
+        </header>
+
+        <main>
+            <div class="error-message hidden">
+                <i data-feather="alert-circle"></i>
+                <span>Location not found. Please try again.</span>
+            </div>
+            <div class="weather-content">
+                <div class="primary-weather">
+                    <div class="primary-header">
+                        <div class="location">
+                            <h2 class="city-state"></h2>
+                            <div class="country"></div>
+                        </div>
+                        <div class="datetime">
+                            <div class="date-time-wrapper">
+                                <span class="day"></span>
+                                <span class="time"></span>
+                            </div>
+                            <div class="condition">
+                                <i data-feather="sun"></i>
+                                <span></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="weather-info">
+                        <div class="temperature"></div>
+                    </div>
+                </div>
+
+                <div class="weather-details">
+                    <div class="detail-card">
+                        <i data-feather="droplet"></i>
+                        <span class="label">Humidity</span>
+                        <span class="value"></span>
+                    </div>
+                    <div class="detail-card">
+                        <i data-feather="wind"></i>
+                        <span class="label">Wind</span>
+                        <span class="value"></span>
+                    </div>
+                    <div class="detail-card">
+                        <i data-feather="cloud-rain"></i>
+                        <span class="label">Precipitation</span>
+                        <span class="value"></span>
+                    </div>
+                    <div class="detail-card">
+                        <i data-feather="thermometer"></i>
+                        <span class="label">Feels Like</span>
+                        <span class="value"></span>
+                    </div>
+                    <div class="detail-card">
+                        <i data-feather="eye"></i>
+                        <span class="label">Visibility</span>
+                        <span class="value"></span>
+                    </div>
+                    <div class="detail-card">
+                        <i data-feather="activity"></i>
+                        <span class="label">Pressure</span>
+                        <span class="value"></span>
+                    </div>
+                </div>
+                <div class="temperature-curve">
+                    <canvas id="tempChart"></canvas>
+                </div>
+                <div class="weekly-forecast">
+                    <div class="forecast-card">
+                    </div>
+                </div>
+            </div>
+        </main>
+        <footer class="footer">
+            <p><span>Created for </span><a href="https://www.theodinproject.com" target="_blank" rel="noopener noreferrer">The Odin Project</a><span> by </span><a href="https://x.com/lowresboots" target="_blank" rel="noopener noreferrer">@lowresboots</a></p>
+        </footer>
+    </div>
+</body>
+
+</html>
