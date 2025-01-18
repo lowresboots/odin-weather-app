@@ -107,6 +107,14 @@ body {
     grid-template-columns: 1fr auto;
     gap: 20px;
     align-items: start;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.weather-content.loading {
+    opacity: 0;
+    visibility: hidden;
 }
 
 .primary-weather {
@@ -242,8 +250,15 @@ body {
     background-color: rgba(255, 255, 255, 0.1);
     border-radius: 15px;
     margin: 20px auto;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
+.error-message.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
 
 .error-message .feather {
     color: #ff6b6b;

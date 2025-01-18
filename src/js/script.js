@@ -38,7 +38,7 @@ function showLoading() {
     
     bootLogo.classList.add('icon-hidden');
     loadingLogo.classList.remove('icon-hidden');
-    elements.weatherContent.classList.add('hidden');
+    elements.weatherContent.classList.add('loading');
     elements.errorMessage.classList.add('hidden');
 }
 
@@ -53,7 +53,7 @@ function hideLoading() {
 function showError(message) {
     elements.errorMessage.querySelector('span').textContent = message;
     elements.errorMessage.classList.remove('hidden');
-    elements.weatherContent.classList.add('hidden');
+    elements.weatherContent.classList.add('loading');
     feather.replace();
 }
 
@@ -340,10 +340,9 @@ async function fetchWeather(location) {
 
         if (response.ok) {
             lastWeatherData = data;
-            console.log('Hourly data:', data.days[0].hours);
-            await new Promise(resolve => setTimeout(resolve, 500));
+            await new Promise(resolve => setTimeout(resolve, 300));
             updateUI(data, currentUnit);
-            elements.weatherContent.classList.remove('hidden');
+            elements.weatherContent.classList.remove('loading');
             return data;
         } else {
             throw new Error(data.message || 'Failed to fetch weather data');
