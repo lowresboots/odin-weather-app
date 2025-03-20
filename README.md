@@ -1,5 +1,6 @@
 # Weather Boots 🌦️
 A modern, responsive weather app that provides real-time weather data in a clean, visually appealing interface.
+
 🔗 **Live Demo:** [Weather Boots on GitHub Pages](https://lowresboots.github.io/odin-weather-app/)
 
 ## Features
